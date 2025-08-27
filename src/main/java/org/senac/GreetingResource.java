@@ -3,6 +3,7 @@ package org.senac;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -22,12 +23,6 @@ public class GreetingResource {
         return MyEntity.listAll();
     }
 
-    @GET
-    @Path("/GetAll")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<MyEntity> GetAll(){
-        return MyEntity.listAll();
-    }
 
     @POST
     @Transactional
@@ -37,7 +32,7 @@ public class GreetingResource {
     }
 
     @DELETE
-    @Path ("{id")
+    @Path ("{id}")
     @Transactional
     @Consumes
     public void delete (@PathParam("id")int id){
@@ -45,4 +40,14 @@ public class GreetingResource {
     }
 
 
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public void update(@PathParam("id") Long id, MyEntity entity){
+        entity.id = id;
+        entity.persist();
+    }
 }
+
