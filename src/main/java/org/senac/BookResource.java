@@ -4,6 +4,12 @@ import io.quarkus.panache.common.Sort;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.hibernate.annotations.Parameter;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -12,13 +18,28 @@ import java.util.Set;
 public class BookResource {
 
     @GET
-    public Response getAll() {
+    @Operation(
+            summary = "retorna todos os livros",
+            description = "Retorna uma lista de livros por padrão Json"
+    )
+    @APIResponse(
+            responseCode = "200",
+            description = "Retornar a lista Corretamente",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ArrayList.class)
+            )
+    )
+
+
+    public Response getAll(){
         return Response.ok(Book.listAll()).build();
     }
-
     @GET
     @Path("{id}")
-    public Response getById(@PathParam("id") int id) {
+    public Response getById(
+            @Parameter(description = "Id do livro a ser pesquisado", required = true)
+            @PathParam("id") int id) {
         Book entity = Book.findById(id);
         if (entity == null)
             return Response.status(404).build();
@@ -58,11 +79,36 @@ public class BookResource {
 
 
     @POST
+@RequestBody(
+        required = true,
+        content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Book.class)
+        )
+        @APIResponse(
+            responseCode = "201",
+            description = "Created",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Book.class)
+)
+    @APIResponse(
+        responseCode = "(400)",
+        description = "",
+        content = 
+        schema = 
+    )
+
+
     @Transactional
+
+
     public Response insert(Book book) {
         Book.persist(book);
         return Response.status(201).entity(book).build();
     }
+
+
 
     @DELETE
     @Transactional
